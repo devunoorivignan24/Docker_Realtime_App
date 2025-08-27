@@ -1,0 +1,30 @@
+---
+- name: Deploy Realtime Docker Chat App
+  hosts: local
+  become: true
+  vars:
+    app_dir: "{{ ansible_env.HOME }}/docker-realtime-app"
+  collections:
+    - community.docker
+
+  tasks:
+    - name: Ensure Docker & docker-compose exist
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+        update_cache: yes
+
+    - name: Clone project repository
+      git:
+        repo: 'https://github.com/your-username/docker-realtime-app.git'
+        dest: "{{ app_dir }}"
+        version: main
+        force: yes
+
+    - name: Run the Docker Compose stack
+      community.docker.docker_compose:
+        project_src: "{{ app_dir }}"
+        state: present
+        build: yes
